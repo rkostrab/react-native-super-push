@@ -1,0 +1,14 @@
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="sk.rkostrab.push">
+
+    <application>
+
+        <receiver
+            android:name=".DismissMergedNotificationReceiver"
+            android:exported="true"/>
+
+    </application>
+
+</manifest>
+  
