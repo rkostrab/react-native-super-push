@@ -2,20 +2,21 @@
 package sk.rkostrab.push;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import com.facebook.common.activitylistener.ActivityListener;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -32,11 +33,25 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
     public static final String EVENT_OPEN_NOTIFICATION = "RNSuperPushOpenNotification";
     public static final String EVENT_PENDING_NOTIFICATION = "RNSuperPushPendingNotification";
     public static final String EVENT_REQUEST_PERMISSIONS = "RNSuperPushRequestPermissions";
+    public static final String BROADCAST_FOREGROUND_PUSH = "sk.rkostrab.push.broadcast.foregroundpush";
     private Bundle pendingNotification;
+    private BroadcastReceiver foregroundPushReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            sendEvent(EVENT_OPEN_NOTIFICATION, Arguments.fromBundle(intent.getExtras()));
+        }
+    };
 
     public RNSuperPushModule(ReactApplicationContext reactContext) {
         super(reactContext);
         getReactApplicationContext().addActivityEventListener(this);
+        LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(foregroundPushReceiver, new IntentFilter(BROADCAST_FOREGROUND_PUSH));
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        LocalBroadcastManager.getInstance(getReactApplicationContext()).unregisterReceiver(foregroundPushReceiver);
     }
 
     @Override
@@ -146,4 +161,5 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
             sendEvent(EVENT_PENDING_NOTIFICATION, null);
         }
     }
+
 }

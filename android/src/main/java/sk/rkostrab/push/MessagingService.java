@@ -1,5 +1,6 @@
 package sk.rkostrab.push;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.res.Resources;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+import static sk.rkostrab.push.RNSuperPushModule.BROADCAST_FOREGROUND_PUSH;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_CONTENT_KEY;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_MERGE_KEY;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_MERGE_VALUE_PREFIX;
@@ -49,7 +52,13 @@ public class MessagingService extends FirebaseMessagingService {
             bundle.putString(entry.getKey(), entry.getValue());
         }
         try {
-            showNotification(bundle);
+            if (!isApplicationInForeground()) {
+                showNotification(bundle);
+                return;
+            }
+            Intent intent = new Intent(BROADCAST_FOREGROUND_PUSH);
+            intent.putExtras(bundle);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,6 +151,19 @@ public class MessagingService extends FirebaseMessagingService {
         }
         // show
         NotificationManagerCompat.from(context).notify(notificationId, notification.build());
+    }
+
+    private boolean isApplicationInForeground() {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses != null) {
+            for (ActivityManager.RunningAppProcessInfo processInfo : appProcesses) {
+                if (processInfo.processName.equals(getApplication().getPackageName()) && processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    return processInfo.pkgList.length > 0;
+                }
+            }
+        }
+        return false;
     }
 
 }

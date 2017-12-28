@@ -1,6 +1,12 @@
-import { NativeModules, Platform, DeviceEventEmitter } from 'react-native';
+import ReactNative, { NativeModules, Platform, DeviceEventEmitter } from 'react-native';
 
-const { RNSuperPush } = NativeModules;
+var RNSuperPush;
+if (Platform.OS === 'android') {
+  RNSuperPush = NativeModules.RNSuperPush;
+} else {
+  RNSuperPush = {};
+  var PushNotificationIOS = ReactNative.PushNotificationIOS;
+}
 
 RNSuperPush.configure = (options) => {
 
@@ -33,21 +39,30 @@ RNSuperPush.configure = (options) => {
 	}
 
   if (typeof options.onGetToken !== 'undefined') {
-    if (RNSuperPush.getTokenListener) {
-      RNSuperPush.getTokenListener.remove();
+    if (Platform.OS === 'android') {
+      if (RNSuperPush.getTokenListener) {
+        RNSuperPush.getTokenListener.remove();
+      }
+      RNSuperPush.getTokenListener = DeviceEventEmitter.addListener('RNSuperPushRefreshToken', (obj) => {
+        options.onGetToken(obj.token);
+      });
+    } else {
+      PushNotificationIOS.removeEventListener('register');
+      PushNotificationIOS.addEventListener('register', (obj) => {
+        options.onGetToken(obj);
+      });
     }
-    RNSuperPush.getTokenListener = DeviceEventEmitter.addListener('RNSuperPushRefreshToken', (event) => {
-      options.onGetToken(event.token);
-    });
 	}
 
   if (typeof options.onRequestPermissions !== 'undefined') {
     if (RNSuperPush.requestPermissionsListener) {
       RNSuperPush.requestPermissionsListener.remove();
     }
-    RNSuperPush.requestPermissionsListener = DeviceEventEmitter.addListener('RNSuperPushRequestPermissions', (event) => {
-      options.onRequestPermissions(event.granted, event.errMsg);
-    });
+    if (Platform.OS === 'android') {
+      RNSuperPush.requestPermissionsListener = DeviceEventEmitter.addListener('RNSuperPushRequestPermissions', (event) => {
+        options.onRequestPermissions(event.granted);
+      });
+    }
 	}
 
   if (Platform.OS === 'android') {
@@ -58,6 +73,31 @@ RNSuperPush.configure = (options) => {
       RNSuperPush.grabNotification();
     });
     RNSuperPush.init();
+  } else {
+    // remote iOS notification
+    PushNotificationIOS.removeEventListener('notification');
+    PushNotificationIOS.addEventListener('notification', (data) => {
+      if (data) {
+        options.onOpenNotification(data);
+      }
+    });
+    PushNotificationIOS.getInitialNotification().then((data) => {
+      if (data) {
+        options.onOpenNotification(data);
+      }
+    }).catch((error) => {
+      console.error("getInitialNotification error: " + error.message);
+    });
+    PushNotificationIOS.requestPermissions({
+      alert: true,
+      badge: true,
+      sound: true,
+    }).then((obj) => {
+      var granted = obj.alert || obj.badge || obj.sound ? true : false;
+      options.onRequestPermissions(granted);
+    }).catch((error) => {
+      options.onRequestPermissions(false);
+    });
   }
 
 };

@@ -10,7 +10,7 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 - Setting title and content text keys to define android notifications (solution - how to show android notifications while app is killed)
 
-## Installation (Android)
+## Android installation
 
 - Fire `npm install --save react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.0.0`
 
@@ -29,7 +29,6 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 ```diff
   dependencies {
 +   compile project(':react-native-super-push')
-+   compile 'com.google.firebase:firebase-messaging:11.6.2'
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.facebook.react:react-native:+'  // From node_modules
@@ -104,7 +103,9 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
   }
 ```
 
-- More about notification icons and colors [here](https://firebase.google.com/docs/cloud-messaging/android/client):
+## iOS installation
+
+We're using `PushNotificationIOS` from `react-native` so follow [this guide](https://facebook.github.io/react-native/docs/pushnotificationios.html#content)
 
 ## Usage
 ```javascript
