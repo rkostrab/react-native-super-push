@@ -1,4 +1,4 @@
-import ReactNative, { NativeModules, Platform, DeviceEventEmitter } from 'react-native';
+import ReactNative, { AppState, NativeModules, Platform, DeviceEventEmitter } from 'react-native';
 
 var RNSuperPush;
 if (Platform.OS === 'android') {
@@ -6,6 +6,11 @@ if (Platform.OS === 'android') {
 } else {
   RNSuperPush = {};
   var PushNotificationIOS = ReactNative.PushNotificationIOS;
+}
+
+RNSuperPush.createPayload = (payload) => {
+  payload.isForeground = AppState.currentState === 'active';
+  return payload;
 }
 
 RNSuperPush.configure = (options) => {
@@ -34,7 +39,7 @@ RNSuperPush.configure = (options) => {
       if (event.mergeValue) {
         RNSuperPush.dismissMergedNotification(event.mergeValue);
       }
-      options.onOpenNotification(event);
+      options.onOpenNotification(RNSuperPush.createPayload(event));
     });
 	}
 
@@ -78,12 +83,12 @@ RNSuperPush.configure = (options) => {
     PushNotificationIOS.removeEventListener('notification');
     PushNotificationIOS.addEventListener('notification', (data) => {
       if (data) {
-        options.onOpenNotification(data);
+        options.onOpenNotification(RNSuperPush.createPayload(data));
       }
     });
     PushNotificationIOS.getInitialNotification().then((data) => {
       if (data) {
-        options.onOpenNotification(data);
+        options.onOpenNotification(RNSuperPush.createPayload(data));
       }
     }).catch((error) => {
       console.error("getInitialNotification error: " + error.message);
