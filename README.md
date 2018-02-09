@@ -1,7 +1,7 @@
 
 # react-native-super-push
 
-Stable react native remote push notifications based on FCM (Android) and APNs (iOS - soon).
+Stable react native remote push notifications based on FCM (Android) and APNs (iOS).
 
 ## Features
 - Proper workflow when user tap on notification
@@ -121,11 +121,11 @@ RNSuperPush.configure({
   // android only: key from notification payload which will be content text of notification
   contentKey: "message",
 
-  // optional (default will not merge notifications)
+  // optional (if not set: will not merge notifications)
   // android only: key from notification payload which will be used to merge multiple into one big InboxStyle notification
   mergeKey: "type",
 
-  // optional (default: mipmap/ic_launcher)
+  // optional (if not set: mipmap/ic_launcher)
   // android only: define small icon into notifications from android res directory
   smallIcon: "mipmap/ic_notification_small",
 
@@ -159,5 +159,5 @@ RNSuperPush.getToken();
 ## Troubleshooting
 - **Push notifications are not incoming** - Make sure your `package_name` in `google-services.json` file is same with your apps's package name. If not then change `applicationId` in `android/app/build.gradle` to match `package_name` from `google-services.json`
 
-## TODO
-- integrating ios notifications (soon)
+## Support
+Right now, I am supporting this library for only my own purposes - a few RN based apps. I am going to add more configurable features later.
