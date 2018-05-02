@@ -78,6 +78,9 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void getToken() {
+        if (!NotificationManagerCompat.from(getReactApplicationContext()).areNotificationsEnabled()) {
+            return;
+        }
         Bundle bundle = new Bundle();
         bundle.putString("token", FirebaseInstanceId.getInstance().getToken());
         sendEvent(EVENT_REFRESH_TOKEN, Arguments.fromBundle(bundle));
