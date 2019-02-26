@@ -12,7 +12,7 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ## Android installation
 
-- Fire `npm install --save react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.0.0`
+- Fire `npm install --save react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.1.0`
 
 - Download your `google-services.json` file and place it in `android/app` directory
 
@@ -28,10 +28,10 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ```diff
   dependencies {
-+   compile project(':react-native-super-push')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.facebook.react:react-native:+'  // From node_modules
++   implementation project(':react-native-super-push')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation 'com.facebook.react:react-native:+'  // From node_modules
   }
 ```
 
@@ -39,20 +39,9 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ```diff
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.0.1'
-+   classpath 'com.google.gms:google-services:3.1.1'
+    classpath 'com.android.tools.build:gradle:3.2.1'
++   classpath 'com.google.gms:google-services:4.2.0'
   }
-  allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-+       google()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../node_modules/react-native/android"
-        }
-    }
-}
 ```
 
 - Edit `android/app/build.gradle`. Add **at the bottom** of the file:
