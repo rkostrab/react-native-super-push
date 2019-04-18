@@ -118,6 +118,10 @@ RNSuperPush.configure({
   // android only: define small icon into notifications from android res directory
   smallIcon: "mipmap/ic_notification_small",
 
+  // required
+  // android only: define channel name for android Oreo and above
+  channelName: "Notifications",
+
   onOpenNotification: (payload) => {
     console.log(JSON.stringify(payload));
   },

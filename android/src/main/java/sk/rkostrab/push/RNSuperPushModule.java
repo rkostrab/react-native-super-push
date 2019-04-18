@@ -66,7 +66,11 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
         // token stuff
         getToken();
         // open notification stuff
-        handleIntent(getCurrentActivity().getIntent());
+        try {
+            handleIntent(getCurrentActivity().getIntent());
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setNotificationKey(String prefsKey, String notificationKey) {
