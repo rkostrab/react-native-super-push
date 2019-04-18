@@ -31,6 +31,10 @@ RNSuperPush.configure = (options) => {
     RNSuperPush.setSmallIcon(options.smallIcon);
   }
 
+  if (Platform.OS === 'android' && typeof options.channelName !== 'undefined') {
+    RNSuperPush.setChannelName(options.channelName);
+  }
+
   if (typeof options.onOpenNotification !== 'undefined') {
     if (RNSuperPush.openNotificationListener) {
       RNSuperPush.openNotificationListener.remove();

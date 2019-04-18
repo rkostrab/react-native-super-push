@@ -29,6 +29,7 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
     public static final String PREFS_TITLE_KEY = "sk.rkostrab.push.sharedprefs.titlekey";
     public static final String PREFS_CONTENT_KEY = "sk.rkostrab.push.sharedprefs.contentkey";
     public static final String PREFS_SMALL_ICON_KEY = "RNSuperPushSmallIcon";
+    public static final String PREFS_CHANNEL_NAME_KEY = "RNSuperPushChannelName";
     public static final String EVENT_REFRESH_TOKEN = "RNSuperPushRefreshToken";
     public static final String EVENT_OPEN_NOTIFICATION = "RNSuperPushOpenNotification";
     public static final String EVENT_PENDING_NOTIFICATION = "RNSuperPushPendingNotification";
@@ -104,6 +105,11 @@ public class RNSuperPushModule extends ReactContextBaseJavaModule implements Act
     @ReactMethod
     public void setSmallIcon(String smallIcon) {
         setNotificationKey(PREFS_SMALL_ICON_KEY, smallIcon);
+    }
+
+    @ReactMethod
+    public void setChannelName(String channelName) {
+        setNotificationKey(PREFS_CHANNEL_NAME_KEY, channelName);
     }
 
     @ReactMethod

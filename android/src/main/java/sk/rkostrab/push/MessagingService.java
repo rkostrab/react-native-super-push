@@ -1,15 +1,17 @@
 package sk.rkostrab.push;
 
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +26,7 @@ import java.util.StringTokenizer;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static sk.rkostrab.push.RNSuperPushModule.BROADCAST_FOREGROUND_PUSH;
+import static sk.rkostrab.push.RNSuperPushModule.PREFS_CHANNEL_NAME_KEY;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_CONTENT_KEY;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_MERGE_KEY;
 import static sk.rkostrab.push.RNSuperPushModule.PREFS_MERGE_VALUE_PREFIX;
@@ -121,17 +124,24 @@ public class MessagingService extends FirebaseMessagingService {
             dismissMergedNotificationPendingIntent = PendingIntent.getBroadcast(context, 0, dismissMergedNotificationIntent, FLAG_UPDATE_CURRENT);
         }
         // build notification
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
+        Notification.Builder notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notification = new Notification.Builder(context, getApplicationContext().getPackageName());
+        } else {
+            notification = new Notification.Builder(context);
+        }
         notification.setContentTitle(contentTitle);
         notification.setTicker(contentTitle);
         notification.setContentText(contentText);
         notification.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-        notification.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
-        notification.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notification.setVisibility(Notification.VISIBILITY_PRIVATE);
+        }
+        notification.setPriority(Notification.PRIORITY_DEFAULT);
         notification.setAutoCancel(true);
         notification.setSmallIcon(smallIcon);
         if (array != null) {
-            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
             for (String line : array) {
                 inboxStyle.addLine(line);
             }
@@ -150,7 +160,13 @@ public class MessagingService extends FirebaseMessagingService {
             notification.setDeleteIntent(dismissMergedNotificationPendingIntent);
         }
         // show
-        NotificationManagerCompat.from(context).notify(notificationId, notification.build());
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        String channelName = sharedPrefs.getString(PREFS_CHANNEL_NAME_KEY, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(getApplicationContext().getPackageName(), channelName, NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+        notificationManager.notify(notificationId, notification.build());
     }
 
     private boolean isApplicationInForeground() {

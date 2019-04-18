@@ -17,6 +17,6 @@ android {
 
 dependencies {
     implementation 'com.google.firebase:firebase-messaging:17.4.0'
-    compile 'com.facebook.react:react-native:+'
+    implementation 'com.facebook.react:react-native:+'
 }
   
