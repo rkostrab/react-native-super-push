@@ -170,8 +170,8 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
 
     private void handleIntent(Intent intent, boolean isInitial) {
         pendingNotification = intent.getBundleExtra("notification");
-        pendingNotification.putBoolean("isInitial", isInitial);
         if (pendingNotification != null) {
+            pendingNotification.putBoolean("isInitial", isInitial);
             sendEvent(EVENT_PENDING_NOTIFICATION, null);
         }
     }
