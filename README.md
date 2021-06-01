@@ -12,7 +12,7 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ## Android installation
 
-- Fire `yarn add react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.3.0`
+- Fire `yarn add react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.3.1`
 
 - Download your `google-services.json` file and place it in `android/app` directory
 
