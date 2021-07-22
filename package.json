@@ -1,7 +1,7 @@
 {
   "name": "react-native-super-push",
   "title": "React Native Super Push",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Library for APNs and FCM",
   "main": "index.js",
   "files": [
