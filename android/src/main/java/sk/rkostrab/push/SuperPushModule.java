@@ -56,6 +56,10 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
         }
     };
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
+
+    private static final String NOTIFICATION_PERMISSION = "android.permission.REQUEST_POST_NOTIFICATIONS";
+
     public SuperPushModule(ReactApplicationContext reactContext) {
         super(reactContext);
         getReactApplicationContext().addActivityEventListener(this);
@@ -151,6 +155,18 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
                 sendEvent(EVENT_REQUEST_PERMISSIONS, Arguments.fromBundle(bundle));
                 getToken();
             }
+        }  else if (Build.VERSION.SDK_INT >= 30) {
+            if (ContextCompat.checkSelfPermission(getCurrentActivity(), NOTIFICATION_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted, request it
+                ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{NOTIFICATION_PERMISSION}, PERMISSION_REQUEST_CODE);
+            } else {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("granted", true);
+                sendEvent(EVENT_REQUEST_PERMISSIONS, Arguments.fromBundle(bundle));
+                getToken();
+            }
+        } else {
+            getToken();
         }
     }
 
