@@ -3,6 +3,7 @@ package sk.rkostrab.push;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +11,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -57,6 +60,7 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
     };
 
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE_R = 2;
 
     private static final String NOTIFICATION_PERMISSION = "android.permission.REQUEST_POST_NOTIFICATIONS";
 
@@ -156,9 +160,11 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
                 getToken();
             }
         }  else if (Build.VERSION.SDK_INT >= 30) {
-            if (ContextCompat.checkSelfPermission(getCurrentActivity(), NOTIFICATION_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            if (((NotificationManager) getCurrentActivity().getSystemService(Context.NOTIFICATION_SERVICE))
+                    .isNotificationPolicyAccessGranted()) {
                 // Permission is not granted, request it
-                ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{NOTIFICATION_PERMISSION}, PERMISSION_REQUEST_CODE);
+                Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                getCurrentActivity().startActivityForResult(intent, NOTIFICATION_PERMISSION_REQUEST_CODE_R);
             } else {
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("granted", true);
@@ -194,7 +200,20 @@ public class SuperPushModule extends ReactContextBaseJavaModule implements Activ
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        Log.d("TAG", "onActivityResult: ");
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE_R) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ((NotificationManager) getCurrentActivity().getSystemService(Context.NOTIFICATION_SERVICE))
+                    .isNotificationPolicyAccessGranted()) {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("granted", true);
+                sendEvent(EVENT_REQUEST_PERMISSIONS, Arguments.fromBundle(bundle));
+                getToken();
+            } else {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("granted", false);
+                bundle.putString("errMsg", "Push notifications disabled");
+                sendEvent(EVENT_REQUEST_PERMISSIONS, Arguments.fromBundle(bundle));
+            }
+        }
     }
 
     @Override
