@@ -1,7 +1,7 @@
 
 # react-native-super-push
 
-Stable react native remote push notifications based on FCM (Android) and APNs (iOS). Compatible with newer than RN 61.5
+Stable react native remote push notifications based on FCM (Android) and APNs (iOS). Working even on android 13
 
 ## Features
 - Proper workflow when user tap on notification
@@ -12,7 +12,7 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ## Android installation
 
-- Fire `yarn add react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.3.1`
+- Fire `yarn add react-native-super-push@git+https://github.com/rkostrab/react-native-super-push.git#1.4.0`
 
 - Download your `google-services.json` file and place it in `android/app` directory
 
@@ -20,8 +20,9 @@ Stable react native remote push notifications based on FCM (Android) and APNs (i
 
 ```diff
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.2.1'
-+   classpath 'com.google.gms:google-services:4.3.3'
+    classpath("com.android.tools.build:gradle:7.3.1")
+    classpath("com.facebook.react:react-native-gradle-plugin")
++   classpath 'com.google.gms:google-services:4.3.15'
   }
 ```
 
@@ -36,6 +37,7 @@ apply plugin: "com.android.application"
 
 ```diff
 + <uses-permission android:name="android.permission.VIBRATE" />
++ <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
   <application>
 
@@ -65,7 +67,7 @@ apply plugin: "com.android.application"
 
 ## iOS installation
 
-We're using `PushNotificationIOS` from `react-native-community` so follow [this guide](https://github.com/react-native-community/push-notification-ios)
+I am using `PushNotificationIOS` from `react-native-community` so follow [this guide](https://github.com/react-native-community/push-notification-ios)
 
 ## Usage
 ```javascript
